@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Данил Аксёнов - Фотограф</title>
+<meta name="description" content="Портфолио фотографа: фуд, репортажная и предметная съёмка.">
+<meta name="theme-color" content="#151515">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22%23151515%22/%3E%3Cpath%20fill=%22%23ece8e1%22%20fill-rule=%22evenodd%22%20d=%22M10.5%2011.5H31C46%2011.5%2054%2020%2054%2032S46%2052.5%2031%2052.5H10.5V50H15.5V14H10.5ZM24%2014H31C41.5%2014%2046.5%2021.5%2046.5%2032S41.5%2050%2031%2050H24Z%22/%3E%3Cg%20fill=%22none%22%20stroke=%22%23151515%22%20stroke-linecap=%22round%22%3E%3Cpath%20stroke-width=%221.2%22%20d=%22M19.75%2017.5V46.5%22/%3E%3Cpath%20stroke-width=%221%22%20d=%22M31.5%2012.75C43.75%2012.75%2050.25%2020.75%2050.25%2032C50.25%2043.25%2043.75%2051.25%2031.5%2051.25%22/%3E%3C/g%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Onest:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#151515; --fg:#ece8e1; --mute:#8d8a85; --line:#2b2b2b;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --pad:clamp(20px,5vw,72px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:300 17px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
+
+header{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding:28px var(--pad)}
+header .logo{font:400 22px/1 var(--serif);text-decoration:none;letter-spacing:.02em;white-space:nowrap}
+nav{display:flex;gap:28px;font-size:15px}
+nav a{color:var(--mute);text-decoration:none;white-space:nowrap;transition:color .2s}
+nav a:hover{color:var(--fg)}
+
+/* Шапка со слайдером */
+/* --dim: общее затемнение фото в шапке, от 0 (нет) до 1 (чёрный) */
+.slider{--dim:.35;position:relative;height:clamp(460px,84vh,920px);margin:0 var(--pad);overflow:hidden;background:#1d1d1d}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+.slide.on{opacity:1}
+.slide img,.slide .stub{display:block;width:100%;height:100%;object-fit:cover}
+.shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.78),transparent 65%),rgba(10,10,10,var(--dim));pointer-events:none}
+.hero-text{position:absolute;left:clamp(20px,3vw,44px);bottom:clamp(28px,5vw,56px);max-width:min(90%,720px)}
+.hero-text h1{margin:0;font:300 clamp(48px,9vw,132px)/.95 var(--serif);letter-spacing:-.01em}
+.hero-text p{margin:16px 0 0;max-width:34ch;color:#cfcac2;font-size:18px}
+
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px clamp(20px,5vw,52px);padding:clamp(48px,9vh,96px) var(--pad) clamp(28px,5vh,48px)}
+.filters button{color:var(--mute);font:300 clamp(22px,4.2vw,40px)/1.2 var(--serif);padding:8px 2px;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.filters button:hover{color:var(--fg)}
+.filters button[aria-pressed="true"]{color:var(--fg);border-color:var(--fg)}
+
+/* Ряды слева направо: в каждом ряду кадры одной высоты, порядок строго по номерам */
+.grid{--h:clamp(150px,30vw,380px);--gap:16px;display:flex;flex-wrap:wrap;gap:var(--gap);padding:0 var(--pad)}
+.grid::after{content:"";flex-grow:1000000}
+.grid .empty{padding:0;flex:1 0 100%;text-align:center}
+.item{margin:0;flex:var(--r) 1 calc(var(--r) * var(--h));aspect-ratio:var(--r);min-width:0}
+.item button{height:100%}
+.item button{display:block;width:100%;overflow:hidden;background:#1d1d1d}
+.item img,.stub{display:block;width:100%;height:auto;transition:opacity .25s}
+.item img{height:100%;object-fit:cover}
+.item button:hover img,.item button:hover .stub{opacity:.82}
+.stub{height:auto}
+.empty{padding:0 var(--pad);color:var(--mute)}
+
+section.text{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:clamp(24px,6vw,96px);padding:clamp(72px,14vh,160px) var(--pad) 0}
+section.text h2{margin:0;font:300 clamp(30px,4vw,48px)/1.1 var(--serif)}
+section.text p{margin:0 0 1.1em;max-width:58ch}
+.contacts a{display:block;width:fit-content;margin-bottom:6px;text-decoration:none;border-bottom:1px solid var(--line);transition:border-color .2s}
+.contacts a:hover{border-color:var(--fg)}
+footer{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:clamp(72px,12vh,140px) var(--pad) 36px;color:var(--mute);font-size:14px}
+.to-top{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:5;width:48px;height:48px;display:grid;place-items:center;border:1px solid #3a3a3a;border-radius:50%;background:rgba(21,21,21,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--fg);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .25s,transform .25s,visibility .25s,border-color .2s}
+.to-top.show{opacity:1;visibility:visible;transform:none}
+.to-top:hover{border-color:var(--fg)}
+.to-top svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* Просмотр */
+.lb{position:fixed;inset:0;z-index:10;display:none;background:rgba(14,14,14,.97);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:56px 16px 24px}
+.lb.open{display:flex}
+.lb .view{display:flex;align-items:center;justify-content:center;min-height:0}
+.lb img{max-width:94vw;max-height:78vh;width:auto;height:auto}
+.lb .stub{height:78vh;width:auto;max-width:94vw}
+.lb .btn{position:absolute;color:var(--mute);padding:12px;font-size:15px;transition:color .2s}
+.lb .btn:hover{color:var(--fg)}
+.lb .close{top:12px;right:16px}
+.lb .prev{left:12px;top:50%}
+.lb .next{right:12px;top:50%}
+
+@media (max-width:900px){
+  .grid{--gap:10px}
+  section.text{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  nav{gap:20px;font-size:15px}
+  .lb .prev,.lb .next{top:auto;bottom:8px}
+  .lb .prev{left:16px}.lb .next{right:16px}
+}
+@media (max-width:420px){
+  header{flex-direction:column;align-items:flex-start;gap:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#top">Данил Аксёнов</a>
+  <nav>
+    <a href="#works">Работы</a>
+    <a href="#about">Обо мне</a>
+    <a href="#contacts">Контакты</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="slider" aria-label="Избранные кадры">
+    <div class="slides"></div>
+    <div class="shade"></div>
+    <div class="hero-text">
+      <h1>Фотограф</h1>
+      <p>Снимаю в разных направлениях от фуд-фото до репортажных и портретных кадров </p>
+    </div>
+  </section>
+
+  <div id="works">
+    <div class="filters" role="group" aria-label="Категории"></div>
+    <div class="grid" aria-live="polite"></div>
+  </div>
+
+  <section class="text" id="about">
+    <h2>Обо мне</h2>
+    <div>
+      <p>Меня зовут Данил. Занимаюсь фотографией в разных жанрах и имею многолетний опыт в коммерческой съемке - фотографирую в трёх направлениях: фуд, репортажная и предметная фотография</p>
+      <p>Создаю снимки для ресторанов, заведений, брендов и частных заказчиков, которые работают в меню, соцсетях и на упаковке</p>
+    </div>
+  </section>
+
+  <section class="text" id="contacts">
+    <h2>Контакты</h2>
+    <div class="contacts">
+      <a href="mailto:aksenov202@gmail.com">Почта</a>
+      <a href="https://t.me/dvst2" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://instagram.com/dvesti2" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>© 2026 Данил Аксёнов</span>
+</footer>
+
+<button type="button" class="to-top" aria-label="Наверх"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg></button>
+
+<div class="lb" role="dialog" aria-modal="true" aria-label="Просмотр фотографии">
+  <button class="btn close" aria-label="Закрыть">Закрыть</button>
+  <button class="btn prev" aria-label="Предыдущая">Назад</button>
+  <div class="view"></div>
+  <button class="btn next" aria-label="Следующая">Вперёд</button>
+</div>
+
+<script>
+/* ========== КАК ДОБАВИТЬ ФОТО ==========
+   Галерея: photos/food/1.jpg, 2.jpg, 3.jpg ... (так же photos/report и photos/object)
+   Шапка:   photos/hero/1.jpg, 2.jpg, 3.jpg ...
+   Порядок на сайте по возрастанию номера. Пропуски в номерах допустимы.
+   Больше ничего в коде менять не нужно. */
+const CATS = { food: "Фуд", report: "Репортаж", object: "Предметная" };
+const EXT = "jpg";          // расширение файлов (строчными буквами)
+const MAX = 150;             // сколько номеров проверять в каждой папке: 1..MAX
+const HERO_DELAY = 4500;    // пауза между кадрами в шапке, мс
+const HERO_POS = "45% 45%"; // какую часть кадра видно в шапке при обрезке
+/* ======================================= */
+
+const $ = s => document.querySelector(s);
+
+/* Ищет файлы dir/1.jpg ... dir/MAX.jpg и отдаёт найденные по порядку номеров */
+function discover(dir, each, done, stale = () => false) {
+  const st = new Array(MAX + 2);
+  let next = 1;
+  const flush = () => {
+    while (next <= MAX && st[next]) {
+      if (st[next]) if (st[next] !== "no") each(`${dir}/${next}.${EXT}`, st[next]);
+      next++;
+    }
+    if (next > MAX) done();
+  };
+  for (let n = 1; n <= MAX; n++) {
+    const im = new Image();
+    im.onload = () => { if (!stale()) { st[n] = (im.naturalWidth / im.naturalHeight) || 0.75; flush(); } };
+    im.onerror = () => { if (!stale()) { st[n] = "no"; flush(); } };
+    im.src = `${dir}/${n}.${EXT}`;
+  }
+}
+
+/* ---------- Шапка ---------- */
+const slides = $(".slides");
+let slideCount = 0, cur = 0, auto = false;
+
+function addSlide(html) {
+  const d = document.createElement("div");
+  d.className = "slide" + (slideCount ? "" : " on");
+  d.setAttribute("aria-hidden", slideCount ? "true" : "false");
+  d.innerHTML = html;
+  slides.appendChild(d);
+  slideCount++;
+  if (slideCount > 1 && !auto && !matchMedia("(prefers-reduced-motion:reduce)").matches) {
+    auto = true;
+    setInterval(() => {
+      cur = (cur + 1) % slideCount;
+      [...slides.children].forEach((e, k) => {
+        e.classList.toggle("on", k === cur);
+        e.setAttribute("aria-hidden", k !== cur);
+      });
+    }, HERO_DELAY);
+  }
+}
+
+discover("photos/hero",
+  src => addSlide(`<img src="${src}" alt="Фото" style="object-position:${HERO_POS}">`),
+  () => { if (!slideCount) addSlide('<span class="stub" role="img" aria-label="Фото" style="background:linear-gradient(160deg,hsl(28 14% 28%),hsl(28 18% 17%))"></span>'); });
+
+/* ---------- Галерея ---------- */
+const grid = $(".grid"), filters = $(".filters");
+const lb = $(".lb"), view = $(".lb .view");
+let current = Object.keys(CATS)[0], list = [], idx = 0, opener = null, gen = 0;
+const cache = {};
+
+function renderFilters() {
+  filters.innerHTML = Object.entries(CATS).map(([k, v]) =>
+    `<button type="button" data-k="${k}" aria-pressed="${k === current}">${v}</button>`).join("");
+}
+
+function renderGrid() {
+  const cat = current, my = ++gen;
+  grid.innerHTML = ""; list = [];
+  const add = (src, r) => {
+    const i = list.length;
+    list.push({ src, c: cat, r });
+    grid.insertAdjacentHTML("beforeend",
+      `<figure class="item" style="--r:${r.toFixed(4)}"><button type="button" data-i="${i}" aria-label="Открыть фото"><img src="${src}" alt="${CATS[cat]}"></button></figure>`);
+  };
+  const empty = () => { if (!list.length) grid.innerHTML = '<p class="empty">Здесь пока пусто.</p>'; };
+  if (cache[cat]) { cache[cat].forEach(f => add(f.src, f.r)); empty(); return; }
+  const found = [];
+  discover(`photos/${cat}`, (s, r) => { found.push({ src: s, r }); add(s, r); },
+    () => { cache[cat] = found; empty(); }, () => my !== gen);
+}
+
+filters.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  current = b.dataset.k; renderFilters(); renderGrid();
+});
+
+grid.addEventListener("click", e => {
+  const b = e.target.closest("button[data-i]"); if (!b) return;
+  opener = b; show(+b.dataset.i); lb.classList.add("open");
+  document.body.style.overflow = "hidden"; $(".lb .close").focus();
+});
+
+/* ---------- Просмотр на весь экран ---------- */
+function show(i) {
+  idx = (i + list.length) % list.length;
+  const p = list[idx];
+  view.innerHTML = `<img src="${p.src}" alt="${CATS[p.c]}">`;
+}
+
+function close() {
+  lb.classList.remove("open"); document.body.style.overflow = "";
+  if (opener) opener.focus();
+}
+
+$(".lb .close").onclick = close;
+$(".lb .prev").onclick = () => show(idx - 1);
+$(".lb .next").onclick = () => show(idx + 1);
+lb.addEventListener("click", e => { if (e.target === lb) close(); });
+document.addEventListener("keydown", e => {
+  if (!lb.classList.contains("open")) return;
+  if (e.key === "Escape") close();
+  if (e.key === "ArrowLeft") show(idx - 1);
+  if (e.key === "ArrowRight") show(idx + 1);
+});
+let x0 = null;
+lb.addEventListener("touchstart", e => x0 = e.touches[0].clientX, { passive:true });
+lb.addEventListener("touchend", e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0; x0 = null;
+  if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+});
+
+/* ---------- Кнопка «наверх» ---------- */
+const toTop = $(".to-top");
+toTop.onclick = () => scrollTo(0, 0);
+const onScroll = () => toTop.classList.toggle("show", scrollY > 600);
+addEventListener("scroll", onScroll, { passive: true });
+onScroll();
+
+renderFilters(); renderGrid();
+</script>
+</body>
+</html>
