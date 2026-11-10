@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Данил Аксёнов - Фотограф</title>
+<title>Данил Аксёнов — фотограф</title>
 <meta name="description" content="Портфолио фотографа: фуд, репортажная и предметная съёмка.">
 <meta name="theme-color" content="#151515">
 <link rel="icon" href="favicon.ico" sizes="32x32">
@@ -136,7 +136,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:20px;pa
   <section class="text" id="contacts">
     <h2>Контакты</h2>
     <div class="contacts">
-      <a href="mailto:aksenov202@gmail.com">Почта</a>
+      <a href="mailto:aksenov202@gmail.com">aksenov202@gmail.com</a>
       <a href="https://t.me/dvst2" target="_blank" rel="noopener">Telegram</a>
       <a href="https://instagram.com/dvesti2" target="_blank" rel="noopener">Instagram</a>
     </div>
@@ -160,7 +160,9 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:20px;pa
 /* ========== КАК ДОБАВИТЬ ФОТО ==========
    Галерея: photos/food/1.jpg, 2.jpg, 3.jpg ... (так же photos/report и photos/object)
    Шапка:   photos/hero/1.jpg, 2.jpg, 3.jpg ...
-   Порядок на сайте по возрастанию номера. Пропуски в номерах допустимы.
+   Маленькие копии для плитки (по желанию): photos/food/thumbs/1.jpg и т.д. с теми же номерами.
+   Если копии нет, в плитке показывается обычное фото.
+   Порядок на сайте по возрастанию номера. Пропуски допустимы (но не 12 номеров подряд).
    Больше ничего в коде менять не нужно. */
 const CATS = { food: "Фуд", report: "Репортаж", object: "Предметная" };
 const EXT = "jpg";          // расширение файлов (строчными буквами)
@@ -171,23 +173,38 @@ const HERO_POS = "45% 45%"; // какую часть кадра видно в ш
 
 const $ = s => document.querySelector(s);
 
-/* Ищет файлы dir/1.jpg ... dir/MAX.jpg и отдаёт найденные по порядку номеров */
-function discover(dir, each, done, stale = () => false) {
-  const st = new Array(MAX + 2);
-  let next = 1;
-  const flush = () => {
-    while (next <= MAX && st[next]) {
-      if (st[next]) if (st[next] !== "no") each(`${dir}/${next}.${EXT}`, st[next]);
-      next++;
-    }
-    if (next > MAX) done();
-  };
-  for (let n = 1; n <= MAX; n++) {
+/* Ищет файлы dir/1.jpg ... dir/MAX.jpg пачками по BATCH штук и отдаёт найденные по порядку.
+   Для плитки берёт маленькую копию dir/thumbs/N.jpg, а если её нет, то обычное фото.
+   Если вся пачка оказалась пустой, дальше не ищет (так не плодим лишних запросов). */
+const BATCH = 12;
+const THUMB = "thumbs";   // папка с маленькими копиями внутри папки жанра
+function probe(src) {
+  return new Promise(res => {
     const im = new Image();
-    im.onload = () => { if (!stale()) { st[n] = (im.naturalWidth / im.naturalHeight) || 0.75; flush(); } };
-    im.onerror = () => { if (!stale()) { st[n] = "no"; flush(); } };
-    im.src = `${dir}/${n}.${EXT}`;
+    im.onload = () => res((im.naturalWidth / im.naturalHeight) || 0.75);
+    im.onerror = () => res(0);
+    im.src = src;
+  });
+}
+async function probeItem(dir, n, useThumbs) {
+  const full = `${dir}/${n}.${EXT}`;
+  if (useThumbs) {
+    const th = `${dir}/${THUMB}/${n}.${EXT}`;
+    const r = await probe(th);
+    if (r) return { r, src: full, thumb: th };
   }
+  const r = await probe(full);
+  return r ? { r, src: full, thumb: full } : null;
+}
+async function discover(dir, each, done, stale = () => false, useThumbs = true) {
+  for (let start = 1; start <= MAX; start += BATCH) {
+    const nums = Array.from({ length: Math.min(BATCH, MAX - start + 1) }, (_, i) => start + i);
+    const res = await Promise.all(nums.map(n => probeItem(dir, n, useThumbs)));
+    if (stale()) return;
+    res.forEach(it => { if (it) each(it.src, it.r, it.thumb); });
+    if (!res.some(Boolean)) break;
+  }
+  if (!stale()) done();
 }
 
 /* ---------- Шапка ---------- */
@@ -215,7 +232,8 @@ function addSlide(html) {
 
 discover("photos/hero",
   src => addSlide(`<img src="${src}" alt="Фото" style="object-position:${HERO_POS}">`),
-  () => { if (!slideCount) addSlide('<span class="stub" role="img" aria-label="Фото" style="background:linear-gradient(160deg,hsl(28 14% 28%),hsl(28 18% 17%))"></span>'); });
+  () => { if (!slideCount) addSlide('<span class="stub" role="img" aria-label="Фото" style="background:linear-gradient(160deg,hsl(28 14% 28%),hsl(28 18% 17%))"></span>'); },
+  undefined, false);
 
 /* ---------- Галерея ---------- */
 const grid = $(".grid"), filters = $(".filters");
@@ -231,16 +249,16 @@ function renderFilters() {
 function renderGrid() {
   const cat = current, my = ++gen;
   grid.innerHTML = ""; list = [];
-  const add = (src, r) => {
+  const add = (src, r, th) => {
     const i = list.length;
     list.push({ src, c: cat, r });
     grid.insertAdjacentHTML("beforeend",
-      `<figure class="item" style="--r:${r.toFixed(4)}"><button type="button" data-i="${i}" aria-label="Открыть фото"><img src="${src}" alt="${CATS[cat]}"></button></figure>`);
+      `<figure class="item" style="--r:${r.toFixed(4)}"><button type="button" data-i="${i}" aria-label="Открыть фото"><img src="${th}" alt="${CATS[cat]}" decoding="async"></button></figure>`);
   };
   const empty = () => { if (!list.length) grid.innerHTML = '<p class="empty">Здесь пока пусто.</p>'; };
-  if (cache[cat]) { cache[cat].forEach(f => add(f.src, f.r)); empty(); return; }
+  if (cache[cat]) { cache[cat].forEach(f => add(f.src, f.r, f.thumb)); empty(); return; }
   const found = [];
-  discover(`photos/${cat}`, (s, r) => { found.push({ src: s, r }); add(s, r); },
+  discover(`photos/${cat}`, (s, r, th) => { found.push({ src: s, r, thumb: th }); add(s, r, th); },
     () => { cache[cat] = found; empty(); }, () => my !== gen);
 }
 
